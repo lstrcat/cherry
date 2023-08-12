@@ -7,6 +7,7 @@ import (
 	cherryString "github.com/cherry-game/cherry/extend/string"
 	cherryTime "github.com/cherry-game/cherry/extend/time"
 	"github.com/cherry-game/cherry/logger"
+	"gorm.io/gorm"
 )
 
 // DevAccountTable 开发模式的帐号信息表(platform.TypeDevMode)
@@ -20,6 +21,40 @@ type DevAccountTable struct {
 
 func (*DevAccountTable) TableName() string {
 	return "dev_account"
+}
+
+func AccountRegister(DB *gorm.DB, accountName, password, ip string) int32 {
+	user := DevAccountTable{}
+
+	result := DB.Where("account_name = ?", accountName).First(&user)
+	if result.RowsAffected > 0 {
+		return code.AccountNameIsExist
+	}
+	devAccountTable := &DevAccountTable{
+		AccountId:   guid.Next(),
+		AccountName: accountName,
+		Password:    password,
+		CreateIP:    ip,
+		CreateTime:  cherryTime.Now().Unix(),
+	}
+
+	err := DB.Create(&devAccountTable).Error
+	if err != nil {
+		cherryLogger.Error("Save DevAccountTable failed")
+		return code.Error
+	}
+	return code.OK
+}
+
+func AccountWithName(DB *gorm.DB, accountName string) (*DevAccountTable, error) {
+	user := DevAccountTable{}
+
+	result := DB.Where("account_name = ?", accountName).First(&user)
+
+	if result.RowsAffected <= 0 {
+		return nil, cherryError.Error("account not found")
+	}
+	return &user, nil
 }
 
 func DevAccountRegister(accountName, password, ip string) int32 {
@@ -49,6 +84,10 @@ func DevAccountWithName(accountName string) (*DevAccountTable, error) {
 	}
 
 	return val.(*DevAccountTable), nil
+}
+
+func initGuid() {
+	guid.InitNextId()
 }
 
 // loadDevAccount 节点启动时预加载帐号数据

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/guid"
 	cherryTime "github.com/cherry-game/cherry/extend/time"
+	cherryLogger "github.com/cherry-game/cherry/logger"
+	"gorm.io/gorm"
 )
 
 // UserBindTable uid绑定第三方平台表
@@ -17,6 +19,38 @@ type UserBindTable struct {
 
 func (*UserBindTable) TableName() string {
 	return "user_bind"
+}
+
+func GetUIDFromOpenId(DB *gorm.DB, pid int32, openId string) (int64, bool) {
+	user := UserBindTable{}
+
+	result := DB.Where("pid = ? AND open_id = ?", pid, openId).First(&user)
+
+	if result.RowsAffected <= 0 {
+		return 0, false
+	}
+	return user.UID, true
+}
+
+func BindUIDInDB(DB *gorm.DB, sdkId, pid int32, openId string) (int64, bool) {
+	uid, ok := GetUIDFromOpenId(DB, pid, openId)
+	if ok {
+		return uid, true
+	}
+
+	userBind := &UserBindTable{
+		UID:      guid.Next(),
+		SdkId:    sdkId,
+		PID:      pid,
+		OpenId:   openId,
+		BindTime: cherryTime.Now().ToMillisecond(),
+	}
+
+	err := DB.Create(&userBind).Error
+	if err != nil {
+		cherryLogger.Error("Create UserBindTable failed")
+	}
+	return userBind.UID, true
 }
 
 func GetUID(pid int32, openId string) (int64, bool) {

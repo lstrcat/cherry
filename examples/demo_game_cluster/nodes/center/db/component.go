@@ -21,10 +21,12 @@ func (c *Component) Name() string {
 // Init 组件初始化函数
 // 为了简化部署的复杂性，本示例取消了数据库连接相关的逻辑
 func (c *Component) Init() {
+	cherryLogger.Infof("center-db-component 组件Init")
 }
 
 func (c *Component) OnAfterInit() {
-	addOnload(loadDevAccount)
+	//	addOnload(loadDevAccount)
+	addOnload(initGuid)
 
 	for _, fn := range onLoadFuncList {
 		cherryUtils.Try(fn, func(errString string) {

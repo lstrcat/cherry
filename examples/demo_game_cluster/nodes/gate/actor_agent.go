@@ -144,6 +144,8 @@ func (p *ActorAgent) onSessionClose(agent *pomelo.Agent) {
 	childId := cstring.ToString(session.Uid)
 	if childId != "" {
 		targetPath := cfacade.NewChildPath(serverId, "player", childId)
+
+		clog.Infof("通知game节点 : %s", targetPath)
 		p.Call(targetPath, "sessionClose", nil)
 	}
 
