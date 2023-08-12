@@ -99,7 +99,7 @@ func PlayerNameIsExist(playerName string) (int64, bool) {
 	return 0, false
 }
 
-func GetPlayerTable(DB *gorm.DB, uid int64) (*PlayerTable, bool) {
+func GetPlayerTable(DB *gorm.DB, uid int64, playerId int64) (*PlayerTable, bool) {
 	/*	val, found := playerTableCache.GetIfPresent(playerId)
 		if found {
 			return val.(*PlayerTable), true
@@ -107,10 +107,21 @@ func GetPlayerTable(DB *gorm.DB, uid int64) (*PlayerTable, bool) {
 	*/
 	// TODO 从数据库查数据，如果存在则缓存到 playerTableCache
 	user := &PlayerTable{}
-	result := DB.Where("uid = ?", uid).First(&user)
-	if result.RowsAffected > 0 {
-		return user, true
+
+	if uid > 0 {
+		result := DB.Where("uid = ?", uid).First(&user)
+		if result.RowsAffected > 0 {
+			return user, true
+		}
 	}
+
+	if playerId > 0 {
+		result := DB.Where("player_id = ?", playerId).First(&user)
+		if result.RowsAffected > 0 {
+			return user, true
+		}
+	}
+
 	return nil, false
 }
 

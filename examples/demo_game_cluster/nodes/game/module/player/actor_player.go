@@ -24,6 +24,15 @@ type (
 	}
 )
 
+func (p *actorPlayer) getOrm() *db.Component {
+	// 获取组件
+	orm := p.App().Find("db_game_component").(*db.Component)
+	if orm == nil {
+		clog.DPanicf("[component = %s] not found.")
+	}
+	return orm
+}
+
 func (p *actorPlayer) OnInit() {
 	clog.Debugf("[actorPlayer] path = %s init!", p.PathString())
 
@@ -54,12 +63,9 @@ func (p *actorPlayer) playerSelect(session *cproto.Session, _ *pb.None) {
 	response := &pb.PlayerSelectResponse{}
 
 	// 获取组件
-	orm := p.App().Find("db_game_component").(*db.Component)
-	if orm == nil {
-		clog.DPanicf("[component = %s] not found.")
-	}
+	orm := p.getOrm()
 
-	playerTable, found := db.GetPlayerTable(orm.DB, session.Uid)
+	playerTable, found := db.GetPlayerTable(orm.DB, session.Uid, 0)
 	if found {
 		playerInfo := buildPBPlayer(playerTable)
 		response.List = append(response.List, &playerInfo)
@@ -125,7 +131,7 @@ func (p *actorPlayer) playerEnter(session *cproto.Session, req *pb.Int64) {
 	}
 
 	// 检查并查找该用户下的该角色
-	playerTable, found := db.GetPlayerTable(nil, req.GetValue())
+	playerTable, found := db.GetPlayerTable(p.getOrm().DB, 0, req.GetValue())
 	if found == false {
 		p.ResponseCode(session, code.PlayerIdError)
 		return
