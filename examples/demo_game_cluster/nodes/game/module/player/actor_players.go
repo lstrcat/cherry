@@ -74,7 +74,7 @@ func (p *ActorPlayers) checkChild() {
 
 // onLoginEvent 玩家登陆事件处理
 func (p *ActorPlayers) onLoginEvent(e cfacade.IEventData) {
-	evt, ok := e.(*event.PlayerLogin)
+	evt, ok := e.(event.PlayerLogin)
 	if ok == false {
 		return
 	}
