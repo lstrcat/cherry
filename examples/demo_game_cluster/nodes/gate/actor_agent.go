@@ -13,6 +13,7 @@ import (
 	cactor "github.com/cherry-game/cherry/net/actor"
 	"github.com/cherry-game/cherry/net/parser/pomelo"
 	cproto "github.com/cherry-game/cherry/net/proto"
+	"time"
 )
 
 var (
@@ -33,6 +34,8 @@ func (p *ActorAgent) OnInit() {
 
 	p.Local().Register("login", p.login)
 	p.Remote().Register("setSession", p.setSession)
+
+	p.Timer().Add(5*time.Second, p.dumpAgents)
 }
 
 func (p *ActorAgent) setSession(req *pb.StringKeyValue) {
@@ -43,6 +46,15 @@ func (p *ActorAgent) setSession(req *pb.StringKeyValue) {
 	if agent, ok := pomelo.GetAgent(p.ActorID()); ok {
 		agent.Session().Set(req.Key, req.Value)
 	}
+}
+
+func (p *ActorAgent) dumpAgents() {
+	// 扫描所有玩家actor
+
+	clog.Info("打印已连接客户:")
+	pomelo.ForeachAgent(func(a *pomelo.Agent) {
+		clog.Infof("uid:%d nodeId:%s nodeType:%s", a.UID(), a.NodeId(), a.NodeType())
+	})
 }
 
 // login 用户登录，验证帐号 (*pb.LoginResponse, int32)

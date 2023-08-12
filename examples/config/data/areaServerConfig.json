@@ -1,7 +1,7 @@
 [
   {
     "serverId": 10001,
-    "serverName": "游戏服1",
+    "serverName": "登录服1",
     "areaId": 1,
     "status": 1
   },

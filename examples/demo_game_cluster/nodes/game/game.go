@@ -4,6 +4,7 @@ import (
 	"github.com/cherry-game/cherry"
 	cherryCron "github.com/cherry-game/cherry/components/cron"
 	cherryGops "github.com/cherry-game/cherry/components/gops"
+	cherryGORM "github.com/cherry-game/cherry/components/gorm"
 	checkCenter "github.com/cherry-game/cherry/examples/demo_game_cluster/internal/component/check_center"
 	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/data"
 	"github.com/cherry-game/cherry/examples/demo_game_cluster/nodes/game/db"
@@ -25,6 +26,8 @@ func Run(profileFilePath, nodeId string) {
 	// 配置cherry引擎
 	app := cherry.Configure(profileFilePath, nodeId, false, cherry.Cluster)
 
+	// 注册gorm组件，数据库具体配置请查看 config/profile-dev.json文件
+	app.Register(cherryGORM.NewComponent())
 	// diagnose
 	app.Register(cherryGops.New())
 	// 注册调度组件

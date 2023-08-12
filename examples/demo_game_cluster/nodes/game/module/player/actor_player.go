@@ -31,8 +31,8 @@ func (p *actorPlayer) OnInit() {
 	p.Remote().Register("sessionClose", p.sessionClose)
 
 	p.Local().Register("select", p.playerSelect) // 注册 查看角色
-	p.Local().Register("create", p.playerCreate) // 注册 创建角色
-	p.Local().Register("enter", p.playerEnter)   // 注册 进入角色
+	//	p.Local().Register("create", p.playerCreate) // 注册 创建角色
+	p.Local().Register("enter", p.playerEnter) // 注册 进入角色
 }
 
 func (p *actorPlayer) OnStop() {
@@ -53,14 +53,16 @@ func (p *actorPlayer) sessionClose() {
 func (p *actorPlayer) playerSelect(session *cproto.Session, _ *pb.None) {
 	response := &pb.PlayerSelectResponse{}
 
-	playerId := db.GetPlayerIdWithUID(session.Uid)
-	if playerId > 0 {
-		// 游戏设定单服单角色，协议设计成可返回多角色
-		playerTable, found := db.GetPlayerTable(playerId)
-		if found {
-			playerInfo := buildPBPlayer(playerTable)
-			response.List = append(response.List, &playerInfo)
-		}
+	// 获取组件
+	orm := p.App().Find("db_game_component").(*db.Component)
+	if orm == nil {
+		clog.DPanicf("[component = %s] not found.")
+	}
+
+	playerTable, found := db.GetPlayerTable(orm.DB, session.Uid)
+	if found {
+		playerInfo := buildPBPlayer(playerTable)
+		response.List = append(response.List, &playerInfo)
 	}
 
 	p.Response(session, response)
@@ -123,7 +125,7 @@ func (p *actorPlayer) playerEnter(session *cproto.Session, req *pb.Int64) {
 	}
 
 	// 检查并查找该用户下的该角色
-	playerTable, found := db.GetPlayerTable(req.GetValue())
+	playerTable, found := db.GetPlayerTable(nil, req.GetValue())
 	if found == false {
 		p.ResponseCode(session, code.PlayerIdError)
 		return

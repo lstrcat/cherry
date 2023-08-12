@@ -150,10 +150,10 @@
       {
         "enable": true,
         "db_id": "game_db_1",
-        "db_name": "dev_game",
-        "host": "dev.com",
-        "user_name": "dev_user",
-        "password": "dev_password",
+        "db_name": "dev_center",
+        "host": "127.0.0.1",
+        "user_name": "root",
+        "password": "fuckyou",
         "max_idle_connect": 4,
         "max_open_connect": 8,
         "log_mode": true

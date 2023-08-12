@@ -79,7 +79,7 @@
          style="display:none;">
         <form class="form-horizontal" role="form">
             <div class="form-group">
-                <label class="col-sm-4 control-label">玩家角色列表</label>
+                <label class="col-sm-4 control-label">玩家角色信息</label>
                 <div class="col-sm-6">
                     <select class="form-control" id="player-list">
                     </select>
@@ -88,7 +88,7 @@
             <div class="form-group">
                 <label class="col-sm-4 control-label"></label>
                 <div class="col-sm-6">
-                    <button type="button" class="btn btn-primary" id="btn-p5">选择角色</button>
+                    <button type="button" class="btn btn-primary" id="btn-p5">进入大厅</button>
                 </div>
             </div>
         </form>
@@ -269,7 +269,7 @@
             // request login
             pomelo.request("gate.user.login", loginData, function (data) {
                 data = proto.pb.LoginResponse.deserializeBinary(data.body).toObject();
-                console.log(data);
+                console.log("websocket登录成功: ", data);
                 if (data.uid > 0) {
                     playerSelect();
                 }
@@ -283,7 +283,7 @@
 
         pomelo.request("game.player.select", noneData, function (data) {
             data = proto.pb.PlayerSelectResponse.deserializeBinary(data.body).toObject();
-            console.log(data);
+            console.log("获得玩家信息: ",data);
 
             if (data.listList.length > 0) {
                 playerInfo = data.listList[0];
@@ -345,7 +345,7 @@
             data = proto.pb.PlayerEnterResponse.deserializeBinary(data.body).toObject();
             console.log(data.guidemaps);
 
-            $("#player-info").html(JSON.stringify(playerInfo) + "角色已进入游戏，流程结束!");
+            $("#player-info").html(JSON.stringify(playerInfo) + "角色已进入游戏!");
 
             $("#p5").hide();
             $("#p6").show();

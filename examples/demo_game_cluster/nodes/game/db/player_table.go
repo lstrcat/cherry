@@ -8,6 +8,7 @@ import (
 	cherryTime "github.com/cherry-game/cherry/extend/time"
 	clog "github.com/cherry-game/cherry/logger"
 	cproto "github.com/cherry-game/cherry/net/proto"
+	"gorm.io/gorm"
 )
 
 // PlayerTable 角色基础表
@@ -98,36 +99,18 @@ func PlayerNameIsExist(playerName string) (int64, bool) {
 	return 0, false
 }
 
-// GetPlayerIds 批量查询玩家id(过滤不存在的)
-func GetPlayerIds(playerIds []int64) []int64 {
-	var list []int64
-
-	for _, playerId := range playerIds {
-		if _, found := GetPlayerTable(playerId); found {
-			list = append(list, playerId)
+func GetPlayerTable(DB *gorm.DB, uid int64) (*PlayerTable, bool) {
+	/*	val, found := playerTableCache.GetIfPresent(playerId)
+		if found {
+			return val.(*PlayerTable), true
 		}
-	}
-
-	return list
-}
-
-// GetPlayerName 获取玩家角色名
-func GetPlayerName(playerId int64) string {
-	playerTable, found := GetPlayerTable(playerId)
-	if found == false {
-		return ""
-	}
-
-	return playerTable.Name
-}
-
-func GetPlayerTable(playerId int64) (*PlayerTable, bool) {
-	val, found := playerTableCache.GetIfPresent(playerId)
-	if found {
-		return val.(*PlayerTable), true
-	}
-
+	*/
 	// TODO 从数据库查数据，如果存在则缓存到 playerTableCache
+	user := &PlayerTable{}
+	result := DB.Where("uid = ?", uid).First(&user)
+	if result.RowsAffected > 0 {
+		return user, true
+	}
 	return nil, false
 }
 
