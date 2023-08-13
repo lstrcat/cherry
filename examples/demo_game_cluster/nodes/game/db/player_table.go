@@ -2,8 +2,6 @@ package db
 
 import (
 	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/code"
-	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/data"
-	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/guid"
 	sessionKey "github.com/cherry-game/cherry/examples/demo_game_cluster/internal/session_key"
 	cherryTime "github.com/cherry-game/cherry/extend/time"
 	clog "github.com/cherry-game/cherry/logger"
@@ -39,19 +37,13 @@ func (p *PlayerTable) InThisServerId() int32 {
 	return p.ServerId
 }
 
-func CreatePlayer(session *cproto.Session, name string, serverId int32, playerInit *data.PlayerInitRow) (*PlayerTable, int32) {
-	// 检测是否有重名角色
-	if _, found := PlayerNameIsExist(name); found {
-		return nil, code.PlayerNameExist
-	}
+func CreatePlayer(DB *gorm.DB, session *cproto.Session, serverId int32) (*PlayerTable, int32) {
 
-	playerId := guid.Next() // new player id
 	pid := session.GetInt32(sessionKey.PID)
 	openId := session.GetString(sessionKey.OpenID)
 
 	if session.Uid < 1 || pid < 1 || openId == "" {
-		clog.Warnf("create playerTable fail. pid or openId is error. [name = %s, pid = %v, openId = %v]",
-			name,
+		clog.Warnf("create playerTable fail. pid or openId is error. [pid = %v, openId = %v]",
 			pid,
 			openId,
 		)
@@ -64,20 +56,28 @@ func CreatePlayer(session *cproto.Session, name string, serverId int32, playerIn
 		UID:            session.Uid,
 		ServerId:       serverId,
 		MergedServerId: serverId,
-		PlayerId:       playerId,
-		Name:           name,
-		Gender:         playerInit.Gender,
-		Level:          playerInit.Level,
+		PlayerId:       0,
+		Name:           "jack",
+		Gender:         1,
+		Level:          99,
 		Exp:            0,
 		CreateTime:     cherryTime.Now().ToMillisecond(),
 	}
 
-	// 先进缓存
-	playerTableCache.Put(playerId, playerTable)
-	playerNameCache.Put(name, playerTable.PlayerId) // 缓存角色名
-	uidCache.Put(playerTable.UID, playerId)
+	/*
+		// 先进缓存
+		playerTableCache.Put(playerId, playerTable)
+		playerNameCache.Put(name, playerTable.PlayerId) // 缓存角色名
+		uidCache.Put(playerTable.UID, playerId)
+	*/
 
-	// TODO 保存db
+	if DB.Create(&playerTable).Error != nil {
+		clog.Warnf("create playerTable fail. pid or openId is error. [pid = %v, openId = %v]",
+			pid,
+			openId,
+		)
+		return nil, code.PlayerCreateFail
+	}
 
 	// TODO 初始化角色相关的表
 	// 道具表

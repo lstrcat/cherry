@@ -2,7 +2,6 @@ package player
 
 import (
 	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/code"
-	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/data"
 	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/event"
 	"github.com/cherry-game/cherry/examples/demo_game_cluster/internal/pb"
 	sessionKey "github.com/cherry-game/cherry/examples/demo_game_cluster/internal/session_key"
@@ -58,17 +57,23 @@ func (p *actorPlayer) sessionClose() {
 	p.PostEvent(evt)
 }
 
-// playerSelect 玩家查询角色列表
+// playerSelect 查询信息并进入
 func (p *actorPlayer) playerSelect(session *cproto.Session, _ *pb.None) {
-
+	response := &pb.PlayerSelectResponse{}
 	// 获取组件
 	orm := p.getOrm()
 
 	// 获取玩家信息
 	playerTable, found := db.GetPlayerTable(orm.DB, session.Uid)
 	if found == false {
-		p.ResponseCode(session, code.PlayerIdError)
-		return
+		// 初次进入创建玩家信息
+		serverId := session.GetInt32(sessionKey.ServerID)
+		newPlayerTable, errCode := db.CreatePlayer(orm.DB, session, serverId)
+		if code.IsFail(errCode) {
+			p.Response(session, response)
+			return
+		}
+		playerTable = newPlayerTable
 	}
 
 	// 保存进入游戏的玩家对应的agentPath
@@ -95,7 +100,6 @@ func (p *actorPlayer) playerSelect(session *cproto.Session, _ *pb.None) {
 
 	// [99]最后推送 角色进入游戏响应结果
 
-	response := &pb.PlayerSelectResponse{}
 	playerInfo := buildPBPlayer(playerTable)
 	response.List = append(response.List, &playerInfo)
 
@@ -105,6 +109,7 @@ func (p *actorPlayer) playerSelect(session *cproto.Session, _ *pb.None) {
 	p.PostEvent(event.NewPlayerLogin(p.ActorID(), playerTable.PlayerId))
 }
 
+/*
 // playerCreate 玩家创角
 func (p *actorPlayer) playerCreate(session *cproto.Session, req *pb.PlayerCreateRequest) {
 	if req.Gender > 1 {
@@ -153,7 +158,7 @@ func (p *actorPlayer) playerCreate(session *cproto.Session, req *pb.PlayerCreate
 	p.Response(session, response)
 }
 
-/*
+
 // playerEnter 玩家进入游戏
 func (p *actorPlayer) playerEnter(session *cproto.Session, req *pb.Int64) {
 	playerId := req.Value
