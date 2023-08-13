@@ -16,6 +16,7 @@ message Player {
   int32  level = 4;       // 角色等级
   int64  createTime = 5;  // 创建时间
   int64  exp = 6;         // 经验值
+  int64  uid = 7;         // 玩家UID
 }
 
 // 查询角色响应

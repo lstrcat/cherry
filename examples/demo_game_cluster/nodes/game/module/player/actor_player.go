@@ -40,8 +40,8 @@ func (p *actorPlayer) OnInit() {
 	p.Remote().Register("sessionClose", p.sessionClose)
 
 	p.Local().Register("select", p.playerSelect) // 注册 查看角色
-	//	p.Local().Register("create", p.playerCreate) // 注册 创建角色
-	p.Local().Register("enter", p.playerEnter) // 注册 进入角色
+	//p.Local().Register("create", p.playerCreate) // 注册 创建角色
+	//p.Local().Register("enter", p.playerEnter) // 注册 进入角色
 }
 
 func (p *actorPlayer) OnStop() {
@@ -60,18 +60,49 @@ func (p *actorPlayer) sessionClose() {
 
 // playerSelect 玩家查询角色列表
 func (p *actorPlayer) playerSelect(session *cproto.Session, _ *pb.None) {
-	response := &pb.PlayerSelectResponse{}
 
 	// 获取组件
 	orm := p.getOrm()
 
-	playerTable, found := db.GetPlayerTable(orm.DB, session.Uid, 0)
-	if found {
-		playerInfo := buildPBPlayer(playerTable)
-		response.List = append(response.List, &playerInfo)
+	// 获取玩家信息
+	playerTable, found := db.GetPlayerTable(orm.DB, session.Uid)
+	if found == false {
+		p.ResponseCode(session, code.PlayerIdError)
+		return
 	}
 
+	// 保存进入游戏的玩家对应的agentPath
+	online.BindPlayer(playerTable.PlayerId, playerTable.UID, session.AgentPath)
+
+	// 设置网关节点session的PlayerID属性
+	p.Call(session.ActorPath(), "setSession", &pb.StringKeyValue{
+		Key:   sessionKey.PlayerID,
+		Value: cstring.ToString(playerTable.PlayerId),
+	})
+	p.uid = playerTable.UID
+	p.playerId = playerTable.PlayerId
+	p.isOnline = true // 设置为在线状态
+
+	// 这里改为客户端主动请求更佳
+	// [01]推送角色 道具数据
+	//module.Item.ListPush(session, playerId)
+	// [02]推送角色 英雄数据
+	//module.Hero.ListPush(session, playerId)
+	// [03]推送角色 成就数据
+	//module.Achieve.CheckNewAndPush(playerId, true, true)
+	// [04]推送角色 邮件数据
+	//module.Mail.ListPush(session, playerId)
+
+	// [99]最后推送 角色进入游戏响应结果
+
+	response := &pb.PlayerSelectResponse{}
+	playerInfo := buildPBPlayer(playerTable)
+	response.List = append(response.List, &playerInfo)
+
 	p.Response(session, response)
+
+	// 角色登录事件
+	p.PostEvent(event.NewPlayerLogin(p.ActorID(), playerTable.PlayerId))
 }
 
 // playerCreate 玩家创角
@@ -122,6 +153,7 @@ func (p *actorPlayer) playerCreate(session *cproto.Session, req *pb.PlayerCreate
 	p.Response(session, response)
 }
 
+/*
 // playerEnter 玩家进入游戏
 func (p *actorPlayer) playerEnter(session *cproto.Session, req *pb.Int64) {
 	playerId := req.Value
@@ -169,6 +201,7 @@ func (p *actorPlayer) playerEnter(session *cproto.Session, req *pb.Int64) {
 	// 角色登录事件
 	p.PostEvent(event.NewPlayerLogin(p.ActorID(), playerId))
 }
+*/
 
 func buildPBPlayer(playerTable *db.PlayerTable) pb.Player {
 	return pb.Player{
@@ -178,5 +211,6 @@ func buildPBPlayer(playerTable *db.PlayerTable) pb.Player {
 		CreateTime: playerTable.CreateTime,
 		Exp:        playerTable.Exp,
 		Gender:     playerTable.Gender,
+		Uid:        playerTable.UID,
 	}
 }

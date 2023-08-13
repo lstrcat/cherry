@@ -20,9 +20,9 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-//响应错误
-//当客户端发送Request类型消息时，如果有异常则返回ErrorResponse
-//踢下线协议也会用到该结构
+// 响应错误
+// 当客户端发送Request类型消息时，如果有异常则返回ErrorResponse
+// 踢下线协议也会用到该结构
 type ErrorResponse struct {
 	Code                 int32    `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Message              string   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`

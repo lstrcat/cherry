@@ -2561,7 +2561,7 @@ jspb.Message.messageSetExtensionsBinary={};jspb.Export={};"object"===typeof expo
 
 var jspb = require('google-protobuf');
 var goog = jspb;
-var global = Function('return this')();
+var global = (function() { return this || window || global || self || Function('return this')(); }).call(null);
 
 goog.exportSymbol('proto.pb.ErrorResponse', null, global);
 /**
@@ -2763,7 +2763,7 @@ goog.object.extend(exports, proto.pb);
 
 var jspb = require('google-protobuf');
 var goog = jspb;
-var global = Function('return this')();
+var global = (function() { return this || window || global || self || Function('return this')(); }).call(null);
 
 goog.exportSymbol('proto.pb.Bool', null, global);
 goog.exportSymbol('proto.pb.Double', null, global);
@@ -5246,7 +5246,7 @@ goog.object.extend(exports, proto.pb);
 
 var jspb = require('google-protobuf');
 var goog = jspb;
-var global = Function('return this')();
+var global = (function() { return this || window || global || self || Function('return this')(); }).call(null);
 
 goog.exportSymbol('proto.pb.LoginRequest', null, global);
 goog.exportSymbol('proto.pb.LoginResponse', null, global);
@@ -5726,7 +5726,7 @@ goog.object.extend(exports, proto.pb);
 
 var jspb = require('google-protobuf');
 var goog = jspb;
-var global = Function('return this')();
+var global = (function() { return this || window || global || self || Function('return this')(); }).call(null);
 
 goog.exportSymbol('proto.pb.Player', null, global);
 goog.exportSymbol('proto.pb.PlayerAttribute', null, global);
@@ -5876,7 +5876,8 @@ proto.pb.Player.toObject = function(includeInstance, msg) {
     gender: jspb.Message.getFieldWithDefault(msg, 3, 0),
     level: jspb.Message.getFieldWithDefault(msg, 4, 0),
     createtime: jspb.Message.getFieldWithDefault(msg, 5, 0),
-    exp: jspb.Message.getFieldWithDefault(msg, 6, 0)
+    exp: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    uid: jspb.Message.getFieldWithDefault(msg, 7, 0)
   };
 
   if (includeInstance) {
@@ -5936,6 +5937,10 @@ proto.pb.Player.deserializeBinaryFromReader = function(msg, reader) {
     case 6:
       var value = /** @type {number} */ (reader.readInt64());
       msg.setExp(value);
+      break;
+    case 7:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setUid(value);
       break;
     default:
       reader.skipField();
@@ -6005,6 +6010,13 @@ proto.pb.Player.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeInt64(
       6,
+      f
+    );
+  }
+  f = message.getUid();
+  if (f !== 0) {
+    writer.writeInt64(
+      7,
       f
     );
   }
@@ -6116,6 +6128,24 @@ proto.pb.Player.prototype.getExp = function() {
  */
 proto.pb.Player.prototype.setExp = function(value) {
   return jspb.Message.setProto3IntField(this, 6, value);
+};
+
+
+/**
+ * optional int64 uid = 7;
+ * @return {number}
+ */
+proto.pb.Player.prototype.getUid = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.pb.Player} returns this
+ */
+proto.pb.Player.prototype.setUid = function(value) {
+  return jspb.Message.setProto3IntField(this, 7, value);
 };
 
 
@@ -6748,7 +6778,7 @@ goog.object.extend(exports, proto.pb);
 
 var jspb = require('google-protobuf');
 var goog = jspb;
-var global = Function('return this')();
+var global = (function() { return this || window || global || self || Function('return this')(); }).call(null);
 
 goog.exportSymbol('proto.cherry.proto.pb.DevRegister', null, global);
 goog.exportSymbol('proto.cherry.proto.pb.NodeState', null, global);
