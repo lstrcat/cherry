@@ -212,10 +212,10 @@ func buildPBPlayer(playerTable *db.PlayerTable) pb.Player {
 	return pb.Player{
 		PlayerId:   playerTable.PlayerId,
 		PlayerName: playerTable.Name,
-		Level:      playerTable.Level,
 		CreateTime: playerTable.CreateTime,
-		Exp:        playerTable.Exp,
 		Gender:     playerTable.Gender,
 		Uid:        playerTable.UID,
+		Score:      playerTable.Score,
+		Recharge:   playerTable.Recharge,
 	}
 }

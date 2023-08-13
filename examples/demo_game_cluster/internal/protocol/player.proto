@@ -13,10 +13,11 @@ message Player {
   int64  playerId = 1;    // 玩家ID
   string playerName = 2;  // 玩家昵称
   int32  gender = 3;      // 角色性别
-  int32  level = 4;       // 角色等级
+  int32  level = 4;        // 玩家vip等级
   int64  createTime = 5;  // 创建时间
-  int64  exp = 6;         // 经验值
   int64  uid = 7;         // 玩家UID
+  int64  score = 8;       // 玩家分
+  int64  recharge = 9;    // 玩家总充值
 }
 
 // 查询角色响应

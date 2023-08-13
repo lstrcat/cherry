@@ -5876,8 +5876,9 @@ proto.pb.Player.toObject = function(includeInstance, msg) {
     gender: jspb.Message.getFieldWithDefault(msg, 3, 0),
     level: jspb.Message.getFieldWithDefault(msg, 4, 0),
     createtime: jspb.Message.getFieldWithDefault(msg, 5, 0),
-    exp: jspb.Message.getFieldWithDefault(msg, 6, 0),
-    uid: jspb.Message.getFieldWithDefault(msg, 7, 0)
+    uid: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    score: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    recharge: jspb.Message.getFieldWithDefault(msg, 9, 0)
   };
 
   if (includeInstance) {
@@ -5934,13 +5935,17 @@ proto.pb.Player.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {number} */ (reader.readInt64());
       msg.setCreatetime(value);
       break;
-    case 6:
-      var value = /** @type {number} */ (reader.readInt64());
-      msg.setExp(value);
-      break;
     case 7:
       var value = /** @type {number} */ (reader.readInt64());
       msg.setUid(value);
+      break;
+    case 8:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setScore(value);
+      break;
+    case 9:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setRecharge(value);
       break;
     default:
       reader.skipField();
@@ -6006,17 +6011,24 @@ proto.pb.Player.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getExp();
-  if (f !== 0) {
-    writer.writeInt64(
-      6,
-      f
-    );
-  }
   f = message.getUid();
   if (f !== 0) {
     writer.writeInt64(
       7,
+      f
+    );
+  }
+  f = message.getScore();
+  if (f !== 0) {
+    writer.writeInt64(
+      8,
+      f
+    );
+  }
+  f = message.getRecharge();
+  if (f !== 0) {
+    writer.writeInt64(
+      9,
       f
     );
   }
@@ -6114,24 +6126,6 @@ proto.pb.Player.prototype.setCreatetime = function(value) {
 
 
 /**
- * optional int64 exp = 6;
- * @return {number}
- */
-proto.pb.Player.prototype.getExp = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.pb.Player} returns this
- */
-proto.pb.Player.prototype.setExp = function(value) {
-  return jspb.Message.setProto3IntField(this, 6, value);
-};
-
-
-/**
  * optional int64 uid = 7;
  * @return {number}
  */
@@ -6146,6 +6140,42 @@ proto.pb.Player.prototype.getUid = function() {
  */
 proto.pb.Player.prototype.setUid = function(value) {
   return jspb.Message.setProto3IntField(this, 7, value);
+};
+
+
+/**
+ * optional int64 score = 8;
+ * @return {number}
+ */
+proto.pb.Player.prototype.getScore = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.pb.Player} returns this
+ */
+proto.pb.Player.prototype.setScore = function(value) {
+  return jspb.Message.setProto3IntField(this, 8, value);
+};
+
+
+/**
+ * optional int64 recharge = 9;
+ * @return {number}
+ */
+proto.pb.Player.prototype.getRecharge = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.pb.Player} returns this
+ */
+proto.pb.Player.prototype.setRecharge = function(value) {
+  return jspb.Message.setProto3IntField(this, 9, value);
 };
 
 

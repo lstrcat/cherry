@@ -14,13 +14,14 @@ type PlayerTable struct {
 	PID            int32  `gorm:"column:pid;comment:'平台id'" json:"pid"`
 	OpenId         string `gorm:"column:open_id;comment:'平台open_id'" json:"openId"`
 	UID            int64  `gorm:"column:uid;comment:'用户id'" json:"uid"`
+	Score          int64  `gorm:"column:score;comment:'用户score'" json:"score"`
+	Recharge       int64  `gorm:"column:recharge;comment:'用户总充值'" json:"recharge"`
+	Level          int32  `gorm:"column:level;comment:'用户vip等级'" json:"level"`
 	ServerId       int32  `gorm:"column:server_id;comment:'创角时的游戏服id'" json:"serverId"`
 	MergedServerId int32  `gorm:"column:merged_server_id;comment:'合服后的游戏服id'" json:"mergedServerId"`
 	PlayerId       int64  `gorm:"column:player_id;primary_key;comment:'角色id'" json:"playerId"`
 	Name           string `gorm:"column:player_name;comment:'角色名称'" json:"name"`
 	Gender         int32  `gorm:"column:gender;comment:'角色性别'" json:"gender"`
-	Level          int32  `gorm:"column:level;comment:'角色等级'" json:"level"`
-	Exp            int64  `gorm:"column:exp;comment:'角色经验'" json:"exp"`
 	CreateTime     int64  `gorm:"column:create_time;comment:'创建时间'" json:"createTime"`
 }
 
@@ -54,13 +55,13 @@ func CreatePlayer(DB *gorm.DB, session *cproto.Session, serverId int32) (*Player
 		PID:            pid,
 		OpenId:         openId,
 		UID:            session.Uid,
+		Score:          0,
+		Recharge:       0,
 		ServerId:       serverId,
 		MergedServerId: serverId,
 		PlayerId:       0,
 		Name:           "jack",
 		Gender:         1,
-		Level:          99,
-		Exp:            0,
 		CreateTime:     cherryTime.Now().ToMillisecond(),
 	}
 
